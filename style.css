@@ -1,0 +1,75 @@
+body {
+    font-family: Roboto, sans-serif;
+}
+
+#display {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.button {
+    font-size: 26px;
+    border: 1px solid lightslategray;
+}
+
+
+
+
+
+
+
+#calc {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0px;
+    margin-bottom: 15px;
+    border-style: solid;
+    width: 300px;
+}
+
+#buttons {
+    display: flex;
+    justify-content: center;
+}
+
+#numbers {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* width: 250px; */
+}
+
+.button {
+    display: flex;
+    width: 50px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    margin: 1px;
+}
+
+.numRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#operators {
+    display: flex;
+    flex-direction: column;
+}
+
+#equals {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-end;
+}
