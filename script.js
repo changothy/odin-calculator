@@ -34,3 +34,10 @@ function operate(operator, a, b) {
     }
 }
 
+function populateDisplay(value) {
+    
+}
+
+
+let displayValue = 0;
+document.querySelector("#display").textContent = displayValue;

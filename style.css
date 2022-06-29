@@ -27,9 +27,9 @@ body {
 
 #display {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
-    padding: 10px 0px;
+    padding: 10px 10px;
     margin-bottom: 15px;
     border-style: solid;
     width: 300px;
