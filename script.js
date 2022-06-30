@@ -58,7 +58,7 @@ function initialize() {
     console.log(buttons);
     buttons.forEach(function (button) {
         button.addEventListener('mouseup', () => {
-            populateDisplay(button.id);
+            populateDisplay(button.textContent);
         });
     });
 }
