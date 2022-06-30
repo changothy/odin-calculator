@@ -34,32 +34,65 @@ function operate(operator, a, b) {
     }
 }
 
-function populateDisplay(value) {
+function populateDisplay(value, equation) {
     displayContent = document.querySelector("#display").textContent;
+    let operator = false;
+    let hasOperator = false;
 
-    if (value == "0" && displayContent == "0") {
+    if (value == "divide" || value == "multiply" || value == "subtract" || value == "add") {
+        operator = true;
+    }
+
+    if (displayContent.includes("x") || displayContent.includes("\\") || displayContent.includes("+") || displayContent.includes("-")) {
+        hasOperator = true;
+    }
+
+    if (value == "0" && displayContent == "0") { // if 0 and we press 0, don't update
         return;
-    } else if (displayContent == "0" && value != "decimal") {
+    } else if (displayContent == "0" && !(value == "decimal" || operator)) { // if 0 and it's not a decimal or operator, then replace the default 0 with the value
         document.querySelector("#display").textContent = value;
         return;
-    } else if (value == "decimal" && displayContent.includes("decimal")) { /* TODO: change decimal to . */
+    } else if (value == "decimal" && displayContent.includes("decimal")) { // if there's already a decimal in the display value, return
+        return;
+    } else if (!isNaN(value) && hasOperator) { // if there's already a decimal in the display value, return
+        document.querySelector("#display").textContent = value;
         return;
     } else {
         document.querySelector("#display").textContent += value;
     }
 }
 
+function recordElements(operator, equation) {
+    equation.push(document.querySelector("#display").textContent)
+    equation.push(operator);
+    console.log(equation);
+}
 
 function initialize() {
-    let displayValue = 0;
-    document.querySelector("#display").textContent = displayValue;
-
-    buttons = document.querySelectorAll(".button");
-    console.log(buttons);
-    buttons.forEach(function (button) {
+    // let displayValue = 0;
+    let equation = new Array();
+    document.querySelector("#display").textContent = 0;
+    
+    numberButtons = document.querySelectorAll(".button.number");
+    numberButtons.forEach(function (button) {
         button.addEventListener('mouseup', () => {
+            populateDisplay(button.textContent, equation);
+        });
+    });
+
+    operationButtons = document.querySelectorAll("#operators .button");
+    operationButtons.forEach(function (button) {
+        button.addEventListener('mouseup', () => {
+            recordElements(button.id, equation);
             populateDisplay(button.textContent);
         });
+    });
+
+    clearButton = document.querySelector("#clear");
+    clearButton.addEventListener('mouseup', () => {
+        // displayValue = 0;
+        equation = new Array();
+        document.querySelector("#display").textContent = 0;
     });
 }
 
