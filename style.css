@@ -10,6 +10,7 @@ body {
 .button {
     font-size: 26px;
     border: 1px solid lightslategray;
+    user-select: none;
 }
 
 
