@@ -2,6 +2,7 @@ let calculated = false;     // equation is calculated once equals is clicked
 let firstValue = null;
 let secondValue = null;
 let operator = null;
+let lastValueEntered = null;
 let secondNumber = false;
 
 // let equation = new Array(); // stores the complete math equation
@@ -25,6 +26,9 @@ function divide(a, b) {
 // Operate on two digits based on operator passed in
 function operate(operator, a, b) {
     let result = 0;
+
+    a = parseFloat(a);
+    b = parseFloat(b);
 
     console.log(a);
     console.log(b);
@@ -72,6 +76,7 @@ function reset() {
     secondValue = null;
     operator = null;
     secondNumber = false;
+    lastValueEntered = null;
     document.querySelector("#display").textContent = 0;
 }
 
@@ -121,7 +126,7 @@ function populateDisplay(value) {
 function deleteNumber() {
     displayContent = document.querySelector("#display").textContent;
 
-    if (displayContent.length > 1) {
+    if (displayContent.length > 1 && !calculated) {
         document.querySelector("#display").textContent = displayContent.slice(0, -1);
     } else {
         document.querySelector("#display").textContent = 0;
@@ -129,13 +134,12 @@ function deleteNumber() {
 
 }
 
+function setLastValueEntered(value) {
+    lastValueEntered = value;
+}
+
 // Update the equation array
 function recordElements(value) {
-    // equation.push(document.querySelector("#display").textContent)
-    // equation.push(operator);
-    // console.log(equation);
-    
-
     /*
         if first number, then save first number and operator
         if second number
@@ -143,29 +147,33 @@ function recordElements(value) {
             if equals, then operate and show result only
     */
 
-    displayValue = document.querySelector("#display").textContent;
+    console.log("recordElements value: " + value);
 
     if (value == "equals" && firstValue == null) {
         return;
     }
 
-    if (operator && isOperator(value)) {
-        operator = value;
-        console.log(operator);
-        return;
-    }
+    // if (isOperator(lastValueEntered) && isOperator(value)) {
+    //     operator = value;
+    //     lastValueEntered = value;
+    //     return;
+    // }
 
-    if (!firstValue) {
-        firstValue = Number(displayValue);
+    if (firstValue == null) {  // if firstValue is empty, that means the first value has been entered and an operator has been clicked
+        if (document.querySelector("#display").textContent == 0) {
+            firstValue = 0;
+        } else {
+            firstValue = Number(document.querySelector("#display").textContent);
+        }
         operator = value;
-    } else {    // if number then operator, save the number and the operator
-        secondValue = Number(displayValue);
+    } else {
+        secondValue = Number(document.querySelector("#display").textContent);
         operate(operator, firstValue, secondValue);
         secondNumber = false;
-        if (isOperator(value)) {
-            firstValue = displayValue;
+        if (isOperator(value)) {    // if number then operator, save the number and the operator
+            firstValue = document.querySelector("#display").textContent;
             operator = value;
-        } else {
+        } else {                    // if equals, then start a new equation and reset everything
             firstValue = null;
             secondValue = null;
             operator = null;
@@ -179,38 +187,33 @@ function initialize() {
     numberButtons = document.querySelectorAll(".button.number");
     numberButtons.forEach(function (button) {
         button.addEventListener('mouseup', () => {
-            // if (calculated) {
-            //     equation = new Array();
-            //     document.querySelector("#display").textContent = 0;
-            //     calculated = false;
-            // }
             populateDisplay(button.textContent);
+            setLastValueEntered(button.textContent);
         });
     });
 
     operationButtons = document.querySelectorAll("#operators .button");
     operationButtons.forEach(function (button) {
         button.addEventListener('mouseup', () => {
-            // if (calculated) {
-            //     equation = new Array();
-            //     calculated = false;
-            // }
-            recordElements(button.id);
-            // populateDisplay(button.textContent);
+            if (isOperator(lastValueEntered)) {
+                operator = button.id;
+            } else {
+                recordElements(button.id);
+            }
+            setLastValueEntered(button.id);
         });
     });
 
     clearButton = document.querySelector("#clear");
     clearButton.addEventListener('mouseup', () => {
-        // equation = new Array();
-        document.querySelector("#display").textContent = 0;
+        // document.querySelector("#display").textContent = 0;
         reset();
     });
 
     equalsButton = document.querySelector("#equals");
     equalsButton.addEventListener('mouseup', () => {
         recordElements(equalsButton.id);
-        // calculate(equation);
+        setLastValueEntered(equalsButton.id);
         calculated = true;
     });
 
