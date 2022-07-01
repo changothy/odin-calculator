@@ -2,6 +2,7 @@ let calculated = false;     // equation is calculated once equals is clicked
 let firstValue = null;
 let secondValue = null;
 let operator = null;
+let secondNumber = false;
 
 // let equation = new Array(); // stores the complete math equation
 
@@ -40,15 +41,21 @@ function operate(operator, a, b) {
             result = multiply(a, b);
             break;
         case "divide":
-            result = divide(a, b);
+            if (b == 0) {
+                result = "Error: divide by 0";
+            } else {
+                result = divide(a, b);
+            }
             break;
         default:
             console.log("Unrecognized operation");
             break;
     }
     
+    if (!isNaN(result) && (result % 1 != 0)) {
+        result = parseFloat(result.toFixed(10)); // round decimals to 10 places
+    }
     document.querySelector("#display").textContent = result;
-    firstValue = result;
 }
 
 function isOperator(value) {
@@ -60,10 +67,11 @@ function isOperator(value) {
 }
 
 function reset() {
-    calculated = false;     // equation is calculated once equals is clicked
+    calculated = false;
     firstValue = null;
     secondValue = null;
     operator = null;
+    secondNumber = false;
     document.querySelector("#display").textContent = 0;
 }
 
@@ -92,17 +100,33 @@ function populateDisplay(value) {
 
     if (value == "0" && displayContent == "0") { // if display is 0, and 0 is clicked, don't update and add more 0s
         return;
-    } else if (displayContent == "0" && !(value == "decimal" || isOperator(value))) { // if display is 0 and it's not a decimal or operator, then replace the default 0 with the value
+    } else if (displayContent == "0" && !(value == ".")) { // if display is 0 and the clicked button is not a decimal or operator, then replace the default 0 with the value
         document.querySelector("#display").textContent = value;
         return;
-    } else if (value == "decimal" && displayContent.includes(".")) { // if there's already a decimal in the display value, return
+    } else if (value == "." && displayContent.includes(".")) { // if decimcal clicked and there's already a decimal in the display value, return
         return;
-    } else if (!isNaN(value) && operator) { // if value is a number and there's an operator, then update display with the new number
+    } else if (!isNaN(value) && firstValue && !secondNumber) {  // if number clicked and we're entering the second number, then replace the display with second number
         document.querySelector("#display").textContent = value;
+        secondNumber = true;
+        return;
+    } else if (calculated) {    // reset the display after equals is clicked and we've calculated a result
+        document.querySelector("#display").textContent = value;
+        calculated = false;
         return;
     } else {
         document.querySelector("#display").textContent += value;
     }
+}
+
+function deleteNumber() {
+    displayContent = document.querySelector("#display").textContent;
+
+    if (displayContent.length > 1) {
+        document.querySelector("#display").textContent = displayContent.slice(0, -1);
+    } else {
+        document.querySelector("#display").textContent = 0;
+    }
+
 }
 
 // Update the equation array
@@ -111,23 +135,42 @@ function recordElements(value) {
     // equation.push(operator);
     // console.log(equation);
     
-    if (firstValue && secondValue) {
-        // if (operator) {
-        //     operate(firstValue, secondValue, operator);
-        // }
-        operate(value, firstValue, secondValue);
-    } else if (firstValue) {
-        secondValue = Number(document.querySelector("#display").textContent);
-        console.log()
-        operate(operator, firstValue, secondValue);
-    } else {    // if number then operator, save the number and the operator
-        firstValue = Number(document.querySelector("#display").textContent);
-        operator = value;
+
+    /*
+        if first number, then save first number and operator
+        if second number
+            if operator, then operate and save result and operator
+            if equals, then operate and show result only
+    */
+
+    displayValue = document.querySelector("#display").textContent;
+
+    if (value == "equals" && firstValue == null) {
+        return;
     }
 
-    // console.log(firstValue);
-    // console.log(secondValue);
-    // console.log(operator);
+    if (operator && isOperator(value)) {
+        operator = value;
+        console.log(operator);
+        return;
+    }
+
+    if (!firstValue) {
+        firstValue = Number(displayValue);
+        operator = value;
+    } else {    // if number then operator, save the number and the operator
+        secondValue = Number(displayValue);
+        operate(operator, firstValue, secondValue);
+        secondNumber = false;
+        if (isOperator(value)) {
+            firstValue = displayValue;
+            operator = value;
+        } else {
+            firstValue = null;
+            secondValue = null;
+            operator = null;
+        }
+    }
 }
 
 function initialize() {
@@ -168,6 +211,12 @@ function initialize() {
     equalsButton.addEventListener('mouseup', () => {
         recordElements(equalsButton.id);
         // calculate(equation);
+        calculated = true;
+    });
+
+    backspaceButton = document.querySelector("#backspace");
+    backspaceButton.addEventListener('mouseup', () => {
+        deleteNumber();
     });
 }
 
