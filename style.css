@@ -11,9 +11,12 @@ body {
     font-size: 26px;
     border: 1px solid lightslategray;
     user-select: none;
+    transition: all .07s ease;
 }
 
-
+.pressed {
+    background-color: cadetblue;
+}
 
 
 #calc {

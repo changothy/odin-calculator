@@ -4,6 +4,7 @@ let secondValue = null;
 let operator = null;
 let lastValueEntered = null;
 let secondNumber = false;
+const displayLengthLimit = 10;
 
 function add(a, b) {
     return a + b;
@@ -28,10 +29,6 @@ function operate(operator, a, b) {
     a = parseFloat(a);
     b = parseFloat(b);
 
-    // console.log(a);
-    // console.log(b);
-    // console.log(operator);
-
     switch(operator) {
         case "add":
             result = add(a, b);
@@ -55,7 +52,7 @@ function operate(operator, a, b) {
     }
     
     if (!isNaN(result) && (result % 1 != 0)) {
-        result = parseFloat(result.toFixed(10)); // round decimals to 10 places
+        result = parseFloat(result.toFixed(displayLengthLimit)); // round decimals to 10 places
     }
     document.querySelector("#display").textContent = result;
 }
@@ -81,6 +78,10 @@ function reset() {
 // Updates the number display
 function populateDisplay(value) {
     displayContent = document.querySelector("#display").textContent;
+
+    if (displayContent.length > displayLengthLimit && !isOperator(lastValueEntered)) {  // set a display length limit of 10
+        return;
+    }
 
     if (value == "0" && displayContent == "0") { // if display is 0, and 0 is clicked, don't update and add more 0s
         return;
@@ -158,7 +159,7 @@ function recordElements(value) {
 
 function keyPressed(e) {
     const button = document.querySelector(`.button[data-key="${e.keyCode}"]`);
-    // button.classList.add('pressed');
+    button.classList.add('pressed');
     
     // if classlist contains number
     if (button.classList.contains("number")) {
@@ -176,7 +177,6 @@ function keyPressed(e) {
         setLastValueEntered(button.id);
     }
     
-
     //if id is clear
     if (button.id == "clear") {
         reset();
@@ -199,13 +199,6 @@ function removeTransition(e) {
     this.classList.remove('pressed');
 }
 
-// function keyReleased(e) {
-//     const button = document.querySelector(`.button[data-key="${e.keyCode}"]`);
-//     if (button != null ) {
-//         button.classList.remove('pressed');
-//     }
-// }
-
 function initialize() {
     document.querySelector("#display").textContent = 0;
     
@@ -215,7 +208,6 @@ function initialize() {
             populateDisplay(button.textContent);
             setLastValueEntered(button.textContent);
         });
-        // button.addEventListener('transitionend', removeTransition);
     });
 
     operationButtons = document.querySelectorAll("#operators .button");
@@ -248,6 +240,8 @@ function initialize() {
     });
 
     window.addEventListener('keydown', keyPressed);
+    const buttonList = document.querySelectorAll(".button");
+    buttonList.forEach(button => button.addEventListener('transitionend', removeTransition));
 }
 
 initialize();
