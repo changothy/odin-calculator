@@ -1,11 +1,9 @@
-let calculated = false;     // equation is calculated once equals is clicked
+let calculated = false;
 let firstValue = null;
 let secondValue = null;
 let operator = null;
 let lastValueEntered = null;
 let secondNumber = false;
-
-// let equation = new Array(); // stores the complete math equation
 
 function add(a, b) {
     return a + b;
@@ -30,9 +28,9 @@ function operate(operator, a, b) {
     a = parseFloat(a);
     b = parseFloat(b);
 
-    console.log(a);
-    console.log(b);
-    console.log(operator);
+    // console.log(a);
+    // console.log(b);
+    // console.log(operator);
 
     switch(operator) {
         case "add":
@@ -80,25 +78,6 @@ function reset() {
     document.querySelector("#display").textContent = 0;
 }
 
-// // Calculate an equation
-// function calculate(equation) {
-//     const initialValue = 1;
-
-//     let latestValue = equation[0];
-//     let operator = "";
-
-//     for (i = 1; i < equation.length; i++) {
-//         if (isOperator(equation[i])) {
-//             operator = equation[i];
-//         } else if (!isNaN(equation[i])) {
-//             latestValue = operate(operator, latestValue, equation[i]);
-//         }
-//     }
-
-//     document.querySelector("#display").textContent = latestValue;
-//     calculated = true;
-// }
-
 // Updates the number display
 function populateDisplay(value) {
     displayContent = document.querySelector("#display").textContent;
@@ -113,6 +92,9 @@ function populateDisplay(value) {
     } else if (!isNaN(value) && firstValue && !secondNumber) {  // if number clicked and we're entering the second number, then replace the display with second number
         document.querySelector("#display").textContent = value;
         secondNumber = true;
+        if (calculated) {   // if we just calculated a result then reset this flag so we can add more numbers
+            calculated = false;
+        }
         return;
     } else if (calculated) {    // reset the display after equals is clicked and we've calculated a result
         document.querySelector("#display").textContent = value;
@@ -131,7 +113,6 @@ function deleteNumber() {
     } else {
         document.querySelector("#display").textContent = 0;
     }
-
 }
 
 function setLastValueEntered(value) {
@@ -152,12 +133,6 @@ function recordElements(value) {
     if (value == "equals" && firstValue == null) {
         return;
     }
-
-    // if (isOperator(lastValueEntered) && isOperator(value)) {
-    //     operator = value;
-    //     lastValueEntered = value;
-    //     return;
-    // }
 
     if (firstValue == null) {  // if firstValue is empty, that means the first value has been entered and an operator has been clicked
         if (document.querySelector("#display").textContent == 0) {
@@ -181,6 +156,56 @@ function recordElements(value) {
     }
 }
 
+function keyPressed(e) {
+    const button = document.querySelector(`.button[data-key="${e.keyCode}"]`);
+    // button.classList.add('pressed');
+    
+    // if classlist contains number
+    if (button.classList.contains("number")) {
+        populateDisplay(button.textContent);
+        setLastValueEntered(button.textContent);
+    }
+
+    //if id is operator
+    if (isOperator(button.id)) {
+        if (isOperator(lastValueEntered)) {
+            operator = button.id;
+        } else {
+            recordElements(button.id);
+        }
+        setLastValueEntered(button.id);
+    }
+    
+
+    //if id is clear
+    if (button.id == "clear") {
+        reset();
+    }
+    
+    //if id is backspace
+    if (button.id == "backspace") {
+        deleteNumber();
+    }
+    
+    // if id is equals
+    if (button.id == "equals") {
+        recordElements(equalsButton.id);
+        setLastValueEntered(equalsButton.id);
+        calculated = true;
+    }
+}
+
+function removeTransition(e) {
+    this.classList.remove('pressed');
+}
+
+// function keyReleased(e) {
+//     const button = document.querySelector(`.button[data-key="${e.keyCode}"]`);
+//     if (button != null ) {
+//         button.classList.remove('pressed');
+//     }
+// }
+
 function initialize() {
     document.querySelector("#display").textContent = 0;
     
@@ -190,6 +215,7 @@ function initialize() {
             populateDisplay(button.textContent);
             setLastValueEntered(button.textContent);
         });
+        // button.addEventListener('transitionend', removeTransition);
     });
 
     operationButtons = document.querySelectorAll("#operators .button");
@@ -206,7 +232,6 @@ function initialize() {
 
     clearButton = document.querySelector("#clear");
     clearButton.addEventListener('mouseup', () => {
-        // document.querySelector("#display").textContent = 0;
         reset();
     });
 
@@ -221,6 +246,8 @@ function initialize() {
     backspaceButton.addEventListener('mouseup', () => {
         deleteNumber();
     });
+
+    window.addEventListener('keydown', keyPressed);
 }
 
 initialize();
